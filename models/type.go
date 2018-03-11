@@ -2,19 +2,17 @@ package models
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/sleepinggenius2/gosmi/types"
 )
 
 type Enum struct {
 	BaseType types.BaseType
-	Values   []NamedNumber
+	Values   EnumValues
 }
 
-type NamedNumber struct {
-	Name  string
-	Value int64
-}
+type EnumValues map[uint64]string
 
 type Range struct {
 	BaseType types.BaseType
@@ -41,4 +39,14 @@ func (t Type) String() string {
 		typeStr += "<" + t.BaseType.String() + ">"
 	}
 	return fmt.Sprintf("Type[%s Status=%s, Format=%s, Units=%s]", typeStr, t.Status, t.Format, t.Units)
+}
+
+// Keys returns a sorted list of all keys
+func (values EnumValues) Keys() []uint64 {
+	keys := make([]uint64, 0, len(values))
+	for k := range values {
+		keys = append(keys, k)
+	}
+	sort.Slice(keys, func(i, j int) bool { return keys[i] < keys[j] })
+	return keys
 }
